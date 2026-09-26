@@ -14,12 +14,12 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
 ## Current status
 - All files are written but **not yet pushed** to GitHub, and the image has **never been built or run**.
   Scripts pass `bash -n`; XML/YAML/JSON pass syntax checks. Expect first-build fixes.
-- The placeholder `spikked27` appears throughout. Replace it with the owner's GitHub
+- The placeholder `ryanthered88` appears throughout. Replace it with the owner's GitHub
   username in **lowercase** (GHCR requires lowercase).
 - The GitHub repo already exists (empty). Ask the owner for its URL if you don't have it.
 
 ## Next steps
-1. Replace `spikked27` everywhere, commit, push to `main`.
+1. Replace `ryanthered88` everywhere, commit, push to `main`.
 2. Watch the GitHub Actions run (`.github/workflows/build.yml`) and fix any build errors.
 3. Owner must manually make the GHCR package public: GitHub profile > Packages > unraid-claude >
    Package settings > Change visibility. (Can't be done with a repo-scoped token.)

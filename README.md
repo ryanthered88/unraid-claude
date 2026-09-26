@@ -20,7 +20,7 @@ not API credits. Remote Control doesn't work with API keys anyway.
 1. Create a new **public** GitHub repo named `unraid-claude`.
 2. Replace the placeholder with your GitHub username (**lowercase**, GHCR requires it):
    ```bash
-   grep -rl spikked27 . | xargs sed -i 's/spikked27/yourname/g'
+   grep -rl ryanthered88 . | xargs sed -i 's/ryanthered88/yourname/g'
    ```
    (macOS: `sed -i ''`)
 3. Push:
@@ -43,10 +43,10 @@ The image rebuilds on every push to `main` and weekly for security updates.
 1. **Docker** tab → **Add Container**.
 2. Click **Template repositories** at the top, paste this on its own line, and **Save**:
    ```
-   https://github.com/spikked27/unraid-claude
+   https://github.com/ryanthered88/unraid-claude
    ```
    If nothing shows up in the next step, use the direct template URL instead:
-   `https://raw.githubusercontent.com/spikked27/unraid-claude/main/templates/claude-code.xml`
+   `https://raw.githubusercontent.com/ryanthered88/unraid-claude/main/templates/claude-code.xml`
 3. Back in **Add Container**, open the **Template** dropdown and choose **claude-code**.
 4. Review the paths and click **Apply**.
 
