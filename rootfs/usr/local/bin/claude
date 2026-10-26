@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Front for the real Claude Code binary in /config/.local/bin.
+# Running claude as root (Unraid's Console button, plain `docker exec`) rewrites
+# .claude.json / .credentials.json as root-only files and logs Remote Control out,
+# so as root this re-runs itself as the claude user.
+REAL=/config/.local/bin/claude
+if [ ! -x "$REAL" ]; then
+    echo "Claude Code isn't installed yet - restart the container to install it." >&2
+    exit 1
+fi
+if [ "$(id -u)" = "0" ]; then
+    exec gosu claude env HOME=/config PATH="/config/.local/bin:$PATH" "$REAL" "$@"
+fi
+exec "$REAL" "$@"

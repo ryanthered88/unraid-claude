@@ -44,6 +44,8 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
   - reads the docker.sock GID and adds `claude` to that group
   - seeds defaults (workspace CLAUDE.md, .claude/settings.json, .bashrc) only if missing
   - one-time recursive chown of /config (marker file `.ownership-set`)
+  - `fix_ownership`: chowns anything not PUID:PGID under /config/.claude.json, .claude/, .local/
+    at every start and every ~5 min in the main loop (root-run claude sessions log RC out)
   - `git init` in /config/workspace (Remote Control shows diffs for git repos)
   - installs Claude Code with the native installer (`curl -fsSL https://claude.ai/install.sh | bash`)
     into /config on first run, otherwise runs `claude update`
@@ -56,6 +58,9 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
   workspace trust -> pkill the remote-control process -> `tmux attach` so the user answers the
   one-time "Enable Remote Control? (y/n)" prompt. Re-execs via gosu if run as root.
 - `claude-attach` (tmux attach), `claude-shell` (interactive claude in workspace).
+- `rootfs/usr/local/bin/claude`: wrapper for /config/.local/bin/claude; re-execs via gosu as the
+  claude user when run as root. Image PATH puts /usr/local/bin before /config/.local/bin so root
+  shells hit it; supervisor/helpers prepend /config/.local/bin and run the real binary directly.
 - `rootfs/defaults/CLAUDE.md`: rules for Claude on the server (Unraid conventions, never mix
   /mnt/user with /mnt/diskX or /mnt/cache in one copy, create apps as templates in templates-user,
   back up before editing, ask before stop/remove, log changes to CHANGES.md).

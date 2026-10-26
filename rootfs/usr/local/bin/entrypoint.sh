@@ -55,6 +55,15 @@ else
     chown "$PUID:$PGID" /config /config/workspace /config/.claude /config/.local
 fi
 
+# Root-run claude sessions leave root-owned login/state files behind, which logs
+# Remote Control out. Hand anything under these paths back to the claude user.
+fix_ownership() {
+    find /config/.claude.json /config/.claude.json.backup /config/.claude /config/.local \
+        \( ! -user "$PUID" -o ! -group "$PGID" \) \
+        -exec chown -h "$PUID:$PGID" {} + 2>/dev/null || true
+}
+fix_ownership
+
 as_user() { gosu "$USER_NAME" env HOME=/config PATH="$PATH" "$@"; }
 
 if [ ! -d /config/workspace/.git ]; then
@@ -90,10 +99,16 @@ trap shutdown SIGTERM SIGINT
 start_tmux
 log "Ready. First time? Open this container's Console in Unraid and run: claude-setup"
 
+ticks=0
 while true; do
     if ! as_user tmux has-session -t claude 2>/dev/null; then
         log "tmux session ended - restarting it."
         start_tmux
+    fi
+    ticks=$(( ticks + 1 ))
+    if [ "$ticks" -ge 30 ]; then   # every ~5 minutes
+        ticks=0
+        fix_ownership
     fi
     sleep 10 &
     wait $!

@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Claude Code itself is installed at first start into /config (persistent),
-# so it can auto-update without needing a new image.
+# so it can auto-update without needing a new image. /usr/local/bin comes first
+# so root shells hit the claude wrapper (drops to the claude user) instead.
 ENV HOME=/config \
-    PATH=/config/.local/bin:$PATH \
+    PATH=/usr/local/bin:/config/.local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin \
     TERM=xterm-256color \
     LANG=C.UTF-8 \
     PUID=99 \
