@@ -47,6 +47,8 @@ mkdir -p /config/workspace /config/.claude /config/.local/bin
 [ -f /config/workspace/CLAUDE.md ] || cp /defaults/CLAUDE.md /config/workspace/CLAUDE.md
 [ -f /config/.claude/settings.json ] || cp /defaults/settings.json /config/.claude/settings.json
 [ -f /config/.bashrc ] || cp /defaults/bashrc /config/.bashrc
+# Older defaults put /config/.local/bin first, so root shells skipped the claude wrapper.
+sed -i 's|^export PATH=/config/.local/bin:\$PATH$|export PATH=/usr/local/bin:/config/.local/bin:$PATH|' /config/.bashrc
 
 if [ ! -f /config/.ownership-set ]; then
     chown -R "$PUID:$PGID" /config

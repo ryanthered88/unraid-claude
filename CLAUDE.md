@@ -60,7 +60,8 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
 - `claude-attach` (tmux attach), `claude-shell` (interactive claude in workspace).
 - `rootfs/usr/local/bin/claude`: wrapper for /config/.local/bin/claude; re-execs via gosu as the
   claude user when run as root. Image PATH puts /usr/local/bin before /config/.local/bin so root
-  shells hit it; supervisor/helpers prepend /config/.local/bin and run the real binary directly.
+  shells hit it; supervisor/helpers prepend /config/.local/bin and run the real binary directly. /config/.bashrc (seeded from
+  defaults/bashrc, migrated by the entrypoint) keeps the same order.
 - `rootfs/defaults/CLAUDE.md`: rules for Claude on the server (Unraid conventions, never mix
   /mnt/user with /mnt/diskX or /mnt/cache in one copy, create apps as templates in templates-user,
   back up before editing, ask before stop/remove, log changes to CHANGES.md).
