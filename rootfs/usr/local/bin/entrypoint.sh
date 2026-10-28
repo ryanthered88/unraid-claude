@@ -98,6 +98,31 @@ shutdown() {
 }
 trap shutdown SIGTERM SIGINT
 
+# Remote Control can sit at an interactive prompt (folder trust, enable, spawn
+# mode) when its answers are missing from .claude.json. Nobody is attached to
+# tmux, so push a Prowl alert (if PROWL_API_KEY is set) once per stuck episode.
+prompt_alerted=0
+check_prompt() {
+    local last
+    last=$(as_user tmux capture-pane -p -t claude 2>/dev/null | grep -v '^[[:space:]]*$' | tail -n 1)
+    if printf '%s' "$last" | grep -Eq '\[y/N\]|\[Y/n\]|\(y/n\)|Choose \['; then
+        [ "$prompt_alerted" = 1 ] && return
+        prompt_alerted=1
+        log "Remote Control is waiting at a prompt: $last (answer it with claude-attach)"
+        if [ -n "${PROWL_API_KEY:-}" ]; then
+            curl -s --max-time 15 https://api.prowlapp.com/publicapi/add \
+                --data-urlencode "apikey=$PROWL_API_KEY" \
+                --data-urlencode "application=Claude" \
+                --data-urlencode "priority=1" \
+                --data-urlencode "event=Remote Control stuck at a prompt" \
+                --data-urlencode "description=${last:0:500} - open the container console and run claude-attach" \
+                >/dev/null || true
+        fi
+    else
+        prompt_alerted=0
+    fi
+}
+
 start_tmux
 log "Ready. First time? Open this container's Console in Unraid and run: claude-setup"
 
@@ -111,6 +136,9 @@ while true; do
     if [ "$ticks" -ge 30 ]; then   # every ~5 minutes
         ticks=0
         fix_ownership
+    fi
+    if [ $(( ticks % 6 )) -eq 5 ]; then   # every ~minute
+        check_prompt
     fi
     sleep 10 &
     wait $!

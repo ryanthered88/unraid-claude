@@ -45,6 +45,8 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
   - seeds defaults (workspace CLAUDE.md, .claude/settings.json, .bashrc) only if missing
   - one-time recursive chown of /config (marker file `.ownership-set`)
   - `fix_ownership`: chowns anything not PUID:PGID under /config/.claude.json, .claude/, .local/
+  - `check_prompt` (~every minute): if the RC tmux pane ends at a y/N, (y/n) or Choose [ prompt, log it
+    and send one Prowl push (PROWL_API_KEY) per stuck episode.
     at every start and every ~5 min in the main loop (root-run claude sessions log RC out)
   - `git init` in /config/workspace (Remote Control shows diffs for git repos)
   - installs Claude Code with the native installer (`curl -fsSL https://claude.ai/install.sh | bash`)
@@ -52,7 +54,8 @@ manage the Docker containers on the server (e.g. set up Tdarr). Must:
   - starts tmux session `claude` running claude-supervisor.sh; loops to restart tmux if it dies;
     SIGTERM sends Ctrl-C to tmux then kills it
 - `rootfs/usr/local/bin/claude-supervisor.sh`: loop running
-  `claude remote-control --name "$RC_SESSION_NAME" --permission-mode "$PERMISSION_MODE" $RC_EXTRA_ARGS`
+  `claude remote-control --name "$RC_SESSION_NAME" --permission-mode "$PERMISSION_MODE" --spawn=same-dir $RC_EXTRA_ARGS`
+  (the --spawn default is dropped if RC_EXTRA_ARGS sets its own --spawn)
   in /config/workspace; 60s backoff if it exits within 60s (e.g. not logged in yet).
 - `rootfs/usr/local/bin/claude-setup`: interactive: `claude auth login` -> run `claude` once to accept
   workspace trust -> pkill the remote-control process -> `tmux attach` so the user answers the

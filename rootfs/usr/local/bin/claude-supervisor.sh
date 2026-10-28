@@ -6,6 +6,10 @@ export PATH=/config/.local/bin:$PATH
 
 NAME="${RC_SESSION_NAME:-Unraid}"
 MODE="${PERMISSION_MODE:-default}"
+# Pin the spawn mode so a lost .claude.json can't leave RC waiting at the
+# spawn-mode prompt. RC_EXTRA_ARGS can still override it.
+SPAWN="--spawn=same-dir"
+case " ${RC_EXTRA_ARGS:-} " in *" --spawn"*) SPAWN="" ;; esac
 
 while true; do
     clear
@@ -14,7 +18,7 @@ while true; do
     echo
     start=$(date +%s)
     # shellcheck disable=SC2086
-    claude remote-control --name "$NAME" --permission-mode "$MODE" ${RC_EXTRA_ARGS:-}
+    claude remote-control --name "$NAME" --permission-mode "$MODE" $SPAWN ${RC_EXTRA_ARGS:-}
     code=$?
     runtime=$(( $(date +%s) - start ))
     echo
